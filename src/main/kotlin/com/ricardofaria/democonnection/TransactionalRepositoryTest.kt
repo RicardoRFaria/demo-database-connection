@@ -8,15 +8,14 @@ import java.util.concurrent.atomic.AtomicInteger
 @Repository
 class TransactionalRepositoryTest(private val jdbcTemplate: NamedParameterJdbcTemplate) {
 
-    private val blockingOpCounter = AtomicInteger()
+
 
     @Transactional
-    fun delayedTransactionalOperation() {
-        val opIdentifier = blockingOpCounter.incrementAndGet()
-        val params = mapOf("novo_nome" to "Empresa do Ricardo LTDA.")
-        println("Eu sou a operação de número $opIdentifier e estou esperando uma connection")
-        val numberOfUpdated = jdbcTemplate.update("UPDATE empresa SET nome = :novo_nome ", params)
+    fun delayedTransactionalOperation(opIdentifier: Int) {
         println("Eu sou a operação de número $opIdentifier e obtive uma connection")
+        val params = mapOf("novo_nome" to "Empresa do Ricardo LTDA.",
+                "id" to opIdentifier)
+        val numberOfUpdated = jdbcTemplate.update("UPDATE empresa SET nome = :novo_nome WHERE id_empresa = :id ", params)
         Thread.sleep(60000)
         println("Number of documents updated: $numberOfUpdated")
     }
